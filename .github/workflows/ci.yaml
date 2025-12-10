@@ -1,5 +1,8 @@
 name: CI
 
+permissions:
+  pull-requests: write
+
 on:
   pull_request:
     branches: [main]
@@ -8,8 +11,9 @@ on:
 
 jobs:
   auto-assigner:
-    # Run for all PRs (internal + fork)
-    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+    # Auto-assigner must run ONLY for pull_request_target
+    # or GitHub blocks write access for fork PRs
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
       - name: Auto-assign PR
