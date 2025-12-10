@@ -1,22 +1,21 @@
+# pull_request: runs in context of the fork, no write access to base repo
+# pull_request_target: runs in context of base repo, has write access (use for actions needing repo permissions)
+
 name: CI
 
-permissions:
-  pull-requests: write
-
 on:
-  pull_request_target:
-    branches: [main]
-    # This runs for fork PRs with base branch workflows + secrets
   pull_request:
     branches: [main]
-    # This runs for same-repo PRs with PR branch workflows
+  pull_request_target:
+    branches: [main]
 
 jobs:
   auto-assigner:
+    # Only run on pull_request_target to have write access for fork PRs
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository) ||
-      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    permissions:
+      pull-requests: write
     steps:
       - name: Auto-assign PR
         uses: toshimaru/auto-author-assign@v2.1.1
@@ -30,18 +29,15 @@ jobs:
           fi
 
   pre-commit:
+    # Only run on pull_request to avoid running twice
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    needs: auto-assigner
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # For fork PRs (pull_request_target): explicitly checkout fork's code
-          # For same-repo PRs (pull_request): default checkout is fine
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-          persist-credentials: false
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: actions/setup-python@v5
         with:
@@ -49,6 +45,6 @@ jobs:
 
       - name: Run pre-commit
         run: |
-          echo "Running pre-commit checks... as a maintainer"
+          echo "Running pre-commit checks..."
           python --version
           # Add your actual pre-commit commands here

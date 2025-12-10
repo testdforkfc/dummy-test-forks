@@ -1,32 +1,20 @@
 name: Unit Tests
 
-permissions:
-  pull-requests: write  # Add if you need to comment on PRs
-
 on:
-  pull_request_target:
-    branches: [main]
-    # This runs for fork PRs with base branch workflows + secrets
   pull_request:
     branches: [main]
-    # This runs for same-repo PRs with PR branch workflows
 
 jobs:
   tests:
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository) ||
-      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           # For fork PRs: explicitly checkout fork's code
-          # For same-repo PRs: default checkout works
+          # For same-repo PRs: this also works fine
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-          persist-credentials: false
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: actions/setup-python@v5
         with:
