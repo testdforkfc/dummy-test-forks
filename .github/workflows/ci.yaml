@@ -3,11 +3,18 @@ name: CI
 on:
   pull_request:
     branches: [main]
-
   pull_request_target:
     branches: [main]
 
 jobs:
+  auto-assigner:
+    # Run for all PRs (internal + fork)
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-assign PR
+        uses: toshimaru/auto-author-assign@v2.1.1
+
   pre-commit:
     runs-on: ubuntu-latest
     steps:
@@ -25,5 +32,5 @@ jobs:
 
       - name: Dummy lint step
         run: |
-          echo "Running dummy CI checks..."
+          echo "Running CI..."
           python --version

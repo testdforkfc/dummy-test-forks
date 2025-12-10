@@ -1,4 +1,4 @@
-from src.calculator import Calculator
+from dummy.calculator import Calculator
 
 def test_add():
     calc = Calculator()
