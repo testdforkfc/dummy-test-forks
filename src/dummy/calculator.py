@@ -1,5 +1,6 @@
 class Calculator:
     def add(self, a, b):
+        print("Adding numbers up")
         return a + b
 
     def multiply(self, a, b):

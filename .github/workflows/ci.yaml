@@ -49,6 +49,6 @@ jobs:
 
       - name: Run pre-commit
         run: |
-          echo "Running pre-commit checks..."
+          echo "Running pre-commit checks... as a fork"
           python --version
           # Add your actual pre-commit commands here
