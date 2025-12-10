@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Auto-assign PR
         uses: toshimaru/auto-author-assign@v2.1.1
+      - name: Print workflow source commit
+        run: echo "Workflow is running from commit $GITHUB_SHA"
 
   pre-commit:
     runs-on: ubuntu-latest
